@@ -71,7 +71,7 @@ import static android.os.BatteryManager.BATTERY_STATUS_FULL;
 import static android.provider.Settings.Secure.getString;
 
 @ReactModule(name = RNDeviceModule.NAME)
-public class RNDeviceModule extends ReactContextBaseJavaModule {
+public class RNDeviceModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
   public static final String NAME = "RNDeviceInfo";
   private final DeviceTypeResolver deviceTypeResolver;
   private final DeviceIdResolver deviceIdResolver;
@@ -92,6 +92,7 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
 
   public RNDeviceModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    reactContext.addLifecycleEventListener(this);
     this.deviceTypeResolver = new DeviceTypeResolver(reactContext);
     this.deviceIdResolver = new DeviceIdResolver(reactContext);
     this.installReferrerClient = new RNInstallReferrerClient(reactContext.getBaseContext());
@@ -187,15 +188,6 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
 
     registerReceiver(getReactApplicationContext(), headphoneBluetoothConnectionReceiver, filter);
   }
-
-  @Override
-  public void onCatalystInstanceDestroy() {
-    getReactApplicationContext().unregisterReceiver(receiver);
-    getReactApplicationContext().unregisterReceiver(headphoneConnectionReceiver);
-    getReactApplicationContext().unregisterReceiver(headphoneWiredConnectionReceiver);
-    getReactApplicationContext().unregisterReceiver(headphoneBluetoothConnectionReceiver);
-  }
-
 
   @Override
   @Nonnull
@@ -1086,4 +1078,24 @@ public class RNDeviceModule extends ReactContextBaseJavaModule {
     }
     return false;
   }
+
+  
+  @Override
+  public void onHostResume() {
+
+  }
+
+  @Override
+  public void onHostPause() {
+
+  }
+
+  @Override
+  public void onHostDestroy() {
+    getReactApplicationContext().unregisterReceiver(receiver);
+    getReactApplicationContext().unregisterReceiver(headphoneConnectionReceiver);
+    getReactApplicationContext().unregisterReceiver(headphoneWiredConnectionReceiver);
+    getReactApplicationContext().unregisterReceiver(headphoneBluetoothConnectionReceiver);
+  }
+  
 }
